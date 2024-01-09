@@ -1,0 +1,18 @@
+[openai]
+api_key = ""
+
+[[prompt]]
+name = "mail"
+text = '''
+Craft a friendly email to share with your workmates. The tone should be approachable, friendly but very concise,
+it should be fast to be read. Use language that is friendly yet professional.
+Use the following text wrapped by tripple backticks to craft your email:
+'''
+description = "Write a friendly email to your workmates. Type EOF to finish."
+
+[[prompt]]
+name = "grammar"
+text = '''
+Fix any grammar issues in the following text wrapped by triple backticks.
+'''
+description = "Fix grammar issues in the following text. Type EOF to finish."

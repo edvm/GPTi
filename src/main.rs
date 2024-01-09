@@ -1,59 +1,77 @@
 use std::collections::HashMap;
-use std::env;
-
+use toml;
 
 use openai::{
-    chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole}, set_key,
+    chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
+    set_key,
 };
 
-use clap::{Parser, ValueEnum};
+use clap::Parser;
+use serde::Deserialize;
 
-#[derive(Clone, Debug, ValueEnum)]
-enum Operation {
-    Mail,
-}
-
-const OPENAI_API_KEY: &str = "OPENAI_API_KEY";
-
-/// A basic example
+/// GPTi
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
 struct Args {
-    /// The operation to perform
-    #[arg(value_enum, short, long)]
-    operation: Operation,
+    /// Config file
+    #[arg(short, long)]
+    config: Option<String>,
+
+    /// Prompt name to use (from config file)
+    #[arg(short, long)]
+    prompt: String,
+}
+
+#[derive(Deserialize)]
+struct Prompt {
+    text: String,
+    name: String,
+    description: String,
 }
 
 #[tokio::main]
 async fn main() {
-    let openai_key = read_openai_key().unwrap();
-    set_key(openai_key);
-
     let args = Args::parse();
+    if let Some(config) = args.config {
+        let api_key = read_openai_key(&config).unwrap();
+        set_key(api_key);
 
-    match args.operation {
-        Operation::Mail => op_mail().await,
-    };
+        for prompt in read_prompts(&config).unwrap() {
+            if prompt.name == args.prompt {
+                exec_prompt(&prompt).await;
+            }
+        }
+    }
 }
 
-fn read_openai_key() -> Result<String, std::io::Error> {
-    let env_name = OPENAI_API_KEY;
+async fn exec_prompt(prompt: &Prompt) {
+    let mut p = String::new();
+    p.push_str(&prompt.text);
 
-    let mut env_map = HashMap::new();
-    for (key, val) in env::vars() {
-        env_map.insert(key, val);
-    }
+    println!("{}", prompt.description);
+    let user_input = get_user_input();
+    let data = format!("```{}```", user_input);
+    p.push_str(&data);
 
-    if !env_map.contains_key(env_name) {
-        let error_message = format!("{} not found in .env file", env_name);
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            error_message,
-        ));
-    } else {
-        let key = env_map.get(env_name).unwrap();
-        Ok(key.to_string())
-    }
+    let reply = get_openai_reply(&p).await;
+
+    println!("{}", reply.content.unwrap());
+}
+
+fn read_openai_key(config: &String) -> Result<String, std::io::Error> {
+    let config_file = std::fs::read_to_string(config).unwrap();
+    let config: toml::Value = toml::from_str(&config_file).unwrap();
+    let openai = config["openai"].clone();
+    let config: HashMap<String, String> = openai.try_into().unwrap();
+    Ok(config["api_key"].clone())
+}
+
+fn read_prompts(config: &String) -> Result<Vec<Prompt>, std::io::Error> {
+    let config_file = std::fs::read_to_string(config).unwrap();
+    let config: toml::Value = toml::from_str(&config_file).unwrap();
+    let prompts = config["prompt"].clone();
+    let prompts: Vec<Prompt> = prompts.try_into().unwrap();
+    Ok(prompts)
 }
 
 fn get_user_input() -> String {
@@ -72,37 +90,19 @@ fn get_user_input() -> String {
     input
 }
 
-async fn op_mail() {
-    println!("Write email content:");
-
-    let input = get_user_input();
-    let prompt = format!(
-        r#"
-    Craft a friendly email to share with your workmates based on the following text wrapped by triple backticks.
-    The tone should be approachable, friendly but very concise, it should be fast to be read.
-    Use language that is friendly yet professional, and encourage your team to share
-    their thoughts on the matter discussed in the input text.
-    ``` 
-    {} 
-    ```
-    "#,
-        input
-    );
-
+async fn get_openai_reply(prompt: &String) -> ChatCompletionMessage {
     let messages = vec![ChatCompletionMessage {
         role: ChatCompletionMessageRole::System,
-        content: Some(prompt),
+        content: Some(prompt.clone()),
         name: None,
         function_call: None,
     }];
 
+    println!("Sending prompt to OpenAI...");
     let chat_completion = ChatCompletion::builder("gpt-3.5-turbo", messages.clone())
         .create()
         .await
         .unwrap();
 
-    let returned_message = chat_completion.choices.first().unwrap().message.clone();
-
-    println!("{}", returned_message.content.clone().unwrap().trim());
-
+    return chat_completion.choices.first().unwrap().message.clone();
 }
