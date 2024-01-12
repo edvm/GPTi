@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use toml;
+use spinners::{Spinner, Spinners};
 
 use openai::{
     chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
@@ -55,7 +56,7 @@ async fn exec_prompt(prompt: &Prompt) {
 
     let reply = get_openai_reply(&p).await;
 
-    println!("{}", reply.content.unwrap());
+    println!("\n{}", reply.content.unwrap());
 }
 
 fn read_openai_key(config: &String) -> Result<String, std::io::Error> {
@@ -91,6 +92,7 @@ fn get_user_input() -> String {
 }
 
 async fn get_openai_reply(prompt: &String) -> ChatCompletionMessage {
+
     let messages = vec![ChatCompletionMessage {
         role: ChatCompletionMessageRole::System,
         content: Some(prompt.clone()),
@@ -98,11 +100,15 @@ async fn get_openai_reply(prompt: &String) -> ChatCompletionMessage {
         function_call: None,
     }];
 
-    println!("Sending prompt to OpenAI...");
+    let mut spinner = Spinner::new(Spinners::Dots9, "Sending prompt to OpenAI...".into());
+
     let chat_completion = ChatCompletion::builder("gpt-3.5-turbo", messages.clone())
         .create()
         .await
         .unwrap();
 
+    spinner.stop();
+
     return chat_completion.choices.first().unwrap().message.clone();
+
 }
