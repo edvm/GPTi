@@ -1,6 +1,10 @@
+mod config;
+mod yesno;
 use std::collections::HashMap;
 use toml;
 use spinners::{Spinner, Spinners};
+
+use crate::config::Config;
 
 use openai::{
     chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
@@ -32,15 +36,26 @@ struct Prompt {
 
 #[tokio::main]
 async fn main() {
-    let args = Args::parse();
-    if let Some(config) = args.config {
-        let api_key = read_openai_key(&config).unwrap();
-        set_key(api_key);
 
-        for prompt in read_prompts(&config).unwrap() {
-            if prompt.name == args.prompt {
-                exec_prompt(&prompt).await;
+    let args = Args::parse();
+    let config = Config::new(args.config);
+
+    if config.doesnt_exists() {
+        match config.create_default() {
+            Ok(_) => std::process::exit(0),
+            Err(e) => {
+                println!("Could not create config file: {}", e);
+                std::process::exit(1);
             }
+        }
+    }
+    
+    let api_key = read_openai_key(&config.path).unwrap();
+    set_key(api_key);
+
+    for prompt in read_prompts(&config.path).unwrap() {
+        if prompt.name == args.prompt {
+            exec_prompt(&prompt).await;
         }
     }
 }
