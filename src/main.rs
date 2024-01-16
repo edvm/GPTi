@@ -1,15 +1,10 @@
 mod config;
+mod openai;
 mod yesno;
-use std::collections::HashMap;
 use toml;
-use spinners::{Spinner, Spinners};
 
 use crate::config::Config;
-
-use openai::{
-    chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
-    set_key,
-};
+use crate::openai::OpenAI;
 
 use clap::Parser;
 use serde::Deserialize;
@@ -36,7 +31,6 @@ struct Prompt {
 
 #[tokio::main]
 async fn main() {
-
     let args = Args::parse();
     let config = Config::new(args.config);
 
@@ -49,18 +43,17 @@ async fn main() {
             }
         }
     }
-    
-    let api_key = read_openai_key(&config.path).unwrap();
-    set_key(api_key);
+
+    let openai = OpenAI::new(&config.path);
 
     for prompt in read_prompts(&config.path).unwrap() {
         if prompt.name == args.prompt {
-            exec_prompt(&prompt).await;
+            exec_prompt(&prompt, &openai).await;
         }
     }
 }
 
-async fn exec_prompt(prompt: &Prompt) {
+async fn exec_prompt(prompt: &Prompt, openai: &OpenAI) {
     let mut p = String::new();
     p.push_str(&prompt.text);
 
@@ -69,17 +62,8 @@ async fn exec_prompt(prompt: &Prompt) {
     let data = format!("```{}```", user_input);
     p.push_str(&data);
 
-    let reply = get_openai_reply(&p).await;
-
-    println!("\n{}", reply.content.unwrap());
-}
-
-fn read_openai_key(config: &String) -> Result<String, std::io::Error> {
-    let config_file = std::fs::read_to_string(config).unwrap();
-    let config: toml::Value = toml::from_str(&config_file).unwrap();
-    let openai = config["openai"].clone();
-    let config: HashMap<String, String> = openai.try_into().unwrap();
-    Ok(config["api_key"].clone())
+    let reply = openai.send(&p).await;
+    println!("\n{}", reply);
 }
 
 fn read_prompts(config: &String) -> Result<Vec<Prompt>, std::io::Error> {
@@ -104,26 +88,4 @@ fn get_user_input() -> String {
         input.push_str(&line);
     }
     input
-}
-
-async fn get_openai_reply(prompt: &String) -> ChatCompletionMessage {
-
-    let messages = vec![ChatCompletionMessage {
-        role: ChatCompletionMessageRole::System,
-        content: Some(prompt.clone()),
-        name: None,
-        function_call: None,
-    }];
-
-    let mut spinner = Spinner::new(Spinners::Dots9, "Sending prompt to OpenAI...".into());
-
-    let chat_completion = ChatCompletion::builder("gpt-3.5-turbo", messages.clone())
-        .create()
-        .await
-        .unwrap();
-
-    spinner.stop();
-
-    return chat_completion.choices.first().unwrap().message.clone();
-
 }
