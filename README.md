@@ -1,7 +1,6 @@
 # GPTi
 
-GPTi is a tool built in Rust that lets you interact with the OpenAI GPT-3 model from the comfort of your command line.
-Also, you can pre-save your own prompts using a gpti.toml config file, in order to avoid typing again and again the same prompts in the web brower (when using chatgpt)
+GPTi is a tool built in Rust that lets you interact with the OpenAI GPT-3 model from the comfort of your command line. Additionally, you can pre-save your own prompts using a gpti.toml config file in order to avoid typing the same prompts over and over again in the web browser when using chatgpt.
 
 ## Getting Started
 
@@ -16,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/gpti.git
+git clone https://github.com/edvm/GPTi.git
 cd gpti
 ```
 
