@@ -1,15 +1,10 @@
 mod config;
-mod yesno;
-use std::collections::HashMap;
+mod openai;
+mod utils;
 use toml;
-use spinners::{Spinner, Spinners};
 
 use crate::config::Config;
-
-use openai::{
-    chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
-    set_key,
-};
+use crate::openai::OpenAI;
 
 use clap::Parser;
 use serde::Deserialize;
@@ -25,10 +20,14 @@ struct Args {
     /// Prompt name to use (from config file)
     #[arg(short, long)]
     prompt: String,
+
+    /// Copy output to clipboard
+    #[arg(long)]
+    copy: bool,
 }
 
 #[derive(Deserialize)]
-struct Prompt {
+pub struct Prompt {
     text: String,
     name: String,
     description: String,
@@ -36,7 +35,6 @@ struct Prompt {
 
 #[tokio::main]
 async fn main() {
-
     let args = Args::parse();
     let config = Config::new(args.config);
 
@@ -49,37 +47,18 @@ async fn main() {
             }
         }
     }
-    
-    let api_key = read_openai_key(&config.path).unwrap();
-    set_key(api_key);
+
+    let openai = OpenAI::new(&config.path);
 
     for prompt in read_prompts(&config.path).unwrap() {
         if prompt.name == args.prompt {
-            exec_prompt(&prompt).await;
+            let reply = openai.send_with_user_input(&prompt).await;
+            if args.copy {
+                utils::copy_to_clipboard(&reply);
+                println!("Copied to clipboard!")
+            }
         }
     }
-}
-
-async fn exec_prompt(prompt: &Prompt) {
-    let mut p = String::new();
-    p.push_str(&prompt.text);
-
-    println!("{}", prompt.description);
-    let user_input = get_user_input();
-    let data = format!("```{}```", user_input);
-    p.push_str(&data);
-
-    let reply = get_openai_reply(&p).await;
-
-    println!("\n{}", reply.content.unwrap());
-}
-
-fn read_openai_key(config: &String) -> Result<String, std::io::Error> {
-    let config_file = std::fs::read_to_string(config).unwrap();
-    let config: toml::Value = toml::from_str(&config_file).unwrap();
-    let openai = config["openai"].clone();
-    let config: HashMap<String, String> = openai.try_into().unwrap();
-    Ok(config["api_key"].clone())
 }
 
 fn read_prompts(config: &String) -> Result<Vec<Prompt>, std::io::Error> {
@@ -88,42 +67,4 @@ fn read_prompts(config: &String) -> Result<Vec<Prompt>, std::io::Error> {
     let prompts = config["prompt"].clone();
     let prompts: Vec<Prompt> = prompts.try_into().unwrap();
     Ok(prompts)
-}
-
-fn get_user_input() -> String {
-    let mut input = String::new();
-
-    loop {
-        let mut line = String::new();
-        std::io::stdin()
-            .read_line(&mut line)
-            .expect("Failed to read line");
-        if line.trim() == "EOF" {
-            break;
-        }
-        input.push_str(&line);
-    }
-    input
-}
-
-async fn get_openai_reply(prompt: &String) -> ChatCompletionMessage {
-
-    let messages = vec![ChatCompletionMessage {
-        role: ChatCompletionMessageRole::System,
-        content: Some(prompt.clone()),
-        name: None,
-        function_call: None,
-    }];
-
-    let mut spinner = Spinner::new(Spinners::Dots9, "Sending prompt to OpenAI...".into());
-
-    let chat_completion = ChatCompletion::builder("gpt-3.5-turbo", messages.clone())
-        .create()
-        .await
-        .unwrap();
-
-    spinner.stop();
-
-    return chat_completion.choices.first().unwrap().message.clone();
-
 }
