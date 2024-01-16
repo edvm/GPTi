@@ -1,4 +1,4 @@
-use crate::yesno::ask_yes_no;
+use crate::utils;
 use std::io::Error;
 
 use directories::ProjectDirs;
@@ -45,7 +45,7 @@ impl Config {
             self.path
         );
 
-        let create_file = ask_yes_no(&msg);
+        let create_file = utils::ask_yes_no(&msg);
 
         if create_file {
             let path = std::path::Path::new(&self.path);

@@ -1,6 +1,6 @@
 mod config;
 mod openai;
-mod yesno;
+mod utils;
 use toml;
 
 use crate::config::Config;

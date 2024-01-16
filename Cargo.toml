@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.4.13", features = ["derive", "env"] }
+cli-clipboard = "0.4.0"
 directories = "5.0.1"
 openai = "1.0.0-alpha.13"
 serde = "1.0.195"
