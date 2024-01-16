@@ -1,3 +1,4 @@
+use crate::{utils, Prompt};
 use openai::{
     chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
     set_key,
@@ -28,6 +29,20 @@ impl OpenAI {
         p.push_str(&prompt);
         let reply = get_openai_reply(&p).await;
         reply.content.unwrap()
+    }
+
+    pub async fn send_with_user_input(&self, prompt: &Prompt) -> String {
+        let mut p = String::new();
+        p.push_str(&prompt.text);
+
+        println!("{}", prompt.description);
+        let user_input = utils::get_user_input();
+        let data = format!("```{}```", user_input);
+        p.push_str(&data);
+
+        let reply = self.send(&p).await;
+        println!("\n{}", reply);
+        reply
     }
 }
 
