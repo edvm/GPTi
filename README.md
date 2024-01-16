@@ -30,6 +30,41 @@ cargo build --release
 ```
 
 ### Usage
+
+GPTI is configured by a *gpti.toml* file which is like:
+```sh
+[openai]
+api_key = "your-api-key"
+
+[[prompt]]
+name = "grammar"
+text = '''
+Fix any grammar issues in the following text wrapped by triple backticks.
+'''
+description = "Fix grammar issues in the following text. Type EOF to finish:"
+
+[[prompt]]
+name = "prompt-1"
+text = '''This is prompt-1. Type EOF to finish:"'''
+description = "Some description"
+
+[[prompt]]
+name = "prompt-2"
+text = '''This is prompt-2. Type EOF to finish:"'''
+description = "Some other description"
+```
+
+This file can have any numbers of *prompts*. Later, you'll pass the *name* value along with the *-p* command line argument. For example:
+```sh
+➜  GPTi git:(main) ✗ ./target/release/gpti -p grammar 
+Fix grammar issues in the following text. Type EOF to finish:
+This a pencil
+EOF
+⢺ Sending prompt to OpenAI...
+This is a pencil.
+```
+
+Check the help for options:
 ```sh
 ➜  $ ./target/release/gpti --help
 GPTi
@@ -42,5 +77,7 @@ Options:
       --copy             Copy output to clipboard
   -h, --help             Print help
   -V, --version          Print version
-➜  GPTi git:(main) ✗ ./target/release/gpti 
 ```
+
+- `--config` is optional. If given, set the path to a config file. If not given, It'll look in the default project dirs (depend on OS). If no config file is found, It'll ask you to create one with default values. Later, you need to set your OpenAI api key on this file.
+- `--copy` if given, output returned by OpenAI will be copied to the clipboard
