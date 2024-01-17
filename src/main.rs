@@ -16,7 +16,11 @@ struct Args {
 
     /// Prompt name to use (from config file)
     #[arg(short, long)]
-    prompt: String,
+    prompt: Option<String>,
+
+    /// Prompt text to use (inlined, text will be sent to OpenAI as is)
+    #[arg(short, long)]
+    text: Option<String>,
 }
 
 #[tokio::main]
@@ -36,11 +40,27 @@ async fn main() {
 
     let openai = OpenAI::new(&config.path);
 
-    for prompt in config.get_prompts() {
-        if prompt.name == args.prompt {
-            let reply = openai.send_with_user_input(&prompt).await;
-            utils::copy_to_clipboard(&reply);
-            println!("-> output copied to clipboard")
+    let mut reply = String::new();
+
+    // If text prompt is provided, use it and exit
+    if let Some(text) = args.text {
+        reply.push_str(&openai.send(&text).await);
+    }
+
+    // If prompt name is provided, use it
+    if let Some(prompt_name) = args.prompt {
+        for prompt in config.get_prompts() {
+            if prompt.name == prompt_name {
+                reply.push_str(&openai.send_with_user_input(&prompt).await);
+            }
         }
+    }
+
+    // If reply is not empty, copy it to clipboard and exit
+    if !reply.is_empty() {
+        println!("\n{}", reply);
+        utils::copy_to_clipboard(&reply);
+        println!("-> output copied to clipboard");
+        std::process::exit(0);
     }
 }
