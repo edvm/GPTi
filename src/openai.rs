@@ -1,4 +1,4 @@
-use crate::{utils, Prompt};
+use crate::{config::Prompt, utils};
 use openai::{
     chat::{ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole},
     set_key,

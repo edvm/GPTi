@@ -1,10 +1,17 @@
 use crate::utils;
-use std::io::Error;
-
 use directories::ProjectDirs;
+use serde::Deserialize;
+use std::io::Error;
 
 pub struct Config {
     pub path: String,
+}
+
+#[derive(Deserialize)]
+pub struct Prompt {
+    pub text: String,
+    pub name: String,
+    pub description: String,
 }
 
 impl Config {
@@ -86,5 +93,13 @@ description = "this is a test prompt"
             Ok(_) => false,
             Err(_) => true,
         }
+    }
+
+    pub fn get_prompts(&self) -> Vec<Prompt> {
+        let config_file = std::fs::read_to_string(&self.path).unwrap();
+        let config: toml::Value = toml::from_str(&config_file).unwrap();
+        let prompts = config["prompt"].clone();
+        let prompts: Vec<Prompt> = prompts.try_into().unwrap();
+        prompts
     }
 }

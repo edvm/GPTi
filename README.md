@@ -74,10 +74,6 @@ Usage: gpti [OPTIONS] --prompt <PROMPT>
 Options:
   -c, --config <CONFIG>  Config file
   -p, --prompt <PROMPT>  Prompt name to use (from config file)
-      --copy             Copy output to clipboard
   -h, --help             Print help
   -V, --version          Print version
 ```
-
-- `--config` is optional. If given, set the path to a config file. If not given, It'll look in the default project dirs (depend on OS). If no config file is found, It'll ask you to create one with default values. Later, you need to set your OpenAI api key on this file.
-- `--copy` if given, output returned by OpenAI will be copied to the clipboard
