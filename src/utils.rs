@@ -11,13 +11,20 @@ pub fn ask_yes_no(prompt: &str) -> bool {
 
 pub fn get_user_input() -> String {
     let mut input = String::new();
+    let mut new_line_count = 0;
 
     loop {
         let mut line = String::new();
         std::io::stdin()
             .read_line(&mut line)
             .expect("Failed to read line");
-        if line.trim() == "EOF" {
+
+        if line == "\n" {
+            new_line_count += 1;
+        } else {
+            new_line_count = 0;
+        }
+        if line.trim() == "EOF" || new_line_count == 3 {
             break;
         }
         input.push_str(&line);

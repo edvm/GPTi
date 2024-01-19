@@ -60,7 +60,7 @@ async fn main() {
     if !reply.is_empty() {
         println!("\n{}", reply);
         utils::copy_to_clipboard(&reply);
-        println!("-> output copied to clipboard");
+        println!("\n-> output copied to clipboard\n");
         std::process::exit(0);
     }
 }

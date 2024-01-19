@@ -41,7 +41,6 @@ impl OpenAI {
         p.push_str(&data);
 
         let reply = self.send(&p).await;
-        println!("\n{}", reply);
         reply
     }
 }
