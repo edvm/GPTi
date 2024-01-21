@@ -31,7 +31,7 @@ download_file() {
   fi
 
   echo "Downloading file from $download_url..."
-  curl -LJO "$download_url" -o "$save_directory/gpti"
+  curl -LJo "$save_directory/gpti" "$download_url" 
 
   if [ $? -ne 0 ]; then
     echo "Error: Failed to download the file. Aborting."
@@ -55,7 +55,8 @@ check_curl
 detect_os
 
 # Ask user for the save directory
-read -p "Enter the directory where you want to save the file: " save_directory
+echo "This script will download the latest version of GPTi and save it to a directory of your choice."
+read -p "Enter the directory where you want to save GPTi: " save_directory
 
 # Ensure the save directory exists
 mkdir -p "$save_directory" || { echo "Error: Unable to create directory. Aborting."; exit 1; }
