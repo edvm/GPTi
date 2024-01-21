@@ -25,9 +25,9 @@ download_file() {
   local download_url
 
   if [ "$OS" == "Linux" ]; then
-    download_url="https://github.com/edvm/GPTi/raw/main/docs/releases/linux/gpti
+    download_url="https://github.com/edvm/GPTi/raw/main/docs/releases/linux/gpti"
   elif [ "$OS" == "Mac" ]; then
-    download_url="https://github.com/edvm/GPTi/raw/main/docs/releases/mac-arm/gpti
+    download_url="https://github.com/edvm/GPTi/raw/main/docs/releases/mac-arm/gpti"
   fi
 
   echo "Downloading file from $download_url..."
