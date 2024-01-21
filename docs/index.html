@@ -234,7 +234,7 @@
 
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-12">
           <h2 class="text-body-emphasis">Usage</h2>
           <p class="fs-5">Run <code>gpti -h</code> to see the available commands:</p>
           <pre class="rounded">
@@ -244,36 +244,47 @@ GPTi
 Usage: gpti [OPTIONS]
 
 Options:
-  -c, --config <CONFIG>  Config file
+  -c, --config <CONFIG>  Config file (optional)
   -p, --prompt <PROMPT>  Prompt name to use (from config file)
   -t, --text <TEXT>      Prompt text to use (inlined, text will be sent to OpenAI as is)
   -h, --help             Print help
   -V, --version          Print version info
             </code>
           </pre>
+          <h5>
+            <code style="color: darkblue;">First time</code>
 
-          <p class="fs-5">For the first time, run <code>gpti -p init</code> to create a <code>gpti.toml</code> config file.
-            It'll be created with a sample prompt. Later, you <b>must add your OpenAI API api key</b> to the config file.
+          </h5>
+            <p>For the first time, run <code>gpti -p init</code> to create a <code>gpti.toml</code> config file.
+              It'll be created with a sample prompt. Later, you <b>must add your OpenAI API api key</b> to the config file.
+            </p>
+
+          <h5>
+            <code style="color: darkcyan;">gpti -p &lt;prompt_name&gt;</code>
+          </h5>
+
+          <p>To use a <b>prompt from the config file</b>, run <code>gpti -p &lt;prompt_name&gt;</code>
+            This is useful if you want to use a prompt that you use often. For example, if you want to use the prompt <code>grammar</code> that you defined in your config file, you can run <code>gpti -p grammar</code>.
+            When running this command, you'll be prompted to enter the text that you want to send to OpenAI. 
+            Sent text will be: <b>text from config file + text you enter</b>.
+            Once you're done, type <code>EOF</code> to finish or press <code>ENTER</code> more than <b>three times</b>.
+            Output will be printed to stdout and <b>will be copied to your clipboard</b>.
           </p>
 
-          <p class="fs-5">To use a <b>prompt from the config file</b>, run <code>gpti -p &lt;prompt_name&gt;</code>
-            This is useful if you want to use a prompt that you use often. For example, if you want to use the prompt <code>grammar</code> that you defined in your config file, you can run <code>gpti -p grammar</code>
-          </p>
+          <h5>
+            <code style="color: darkgoldenrod;">gpti -t "2 + 2?"</code>
+          </h5>
 
-          <p class="fs-5">To use a <b>prompt inlined</b>, run <code>gpti -t &lt;text you'd write on OpenAI website (Message ChatGPT...)&gt;</code>. 
+          <p>To use a <b>prompt inlined</b>, run <code>gpti -t &lt;text you'd write on OpenAI website (Message ChatGPT...)&gt;</code>. 
           This is useful if you want to use a prompt that you don't want to save in the config file. 
           </p>
-
-          <p class="fs-5">If you want to point to a <b>different config file</b>, you can use the <code>-c</code> flag. For example, <code>gpti -c /path/to/config.toml -p grammar</code> 
-          </p>
-
           
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-12">
           <h2 class="text-body-emphasis">Configuration</h2>
 
-          <p class="fs-5">
+          <p>
             GPTi uses a <code>gpti.toml</code> file to store your prompts. You can create this file by running <code>gpti -p init</code> (for the first time).
             The format of the file is as follows:
           </p>
