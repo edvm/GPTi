@@ -32,6 +32,10 @@
         }
       }
 
+      pre {
+        margin-bottom: 0px;
+      }
+
       .b-example-divider {
         width: 100%;
         height: 3rem;
@@ -175,80 +179,75 @@
       GPTi is a tool built in Rust that lets you interact with the OpenAI GPT-3 model from the comfort of your command line. Additionally, you can pre-save your own prompts using a gpti.toml config file in order to avoid typing the same prompts over and over again in the web browser when using chatgpt.
       </p>
 
-    <div class="mb-5">
-      <a href="../examples/" class="btn btn-primary btn-lg px-4">Download examples</a>
+    <div class="mb-3">
+      <a href="./releases/mac-arm/gpti" class="btn btn-primary btn-lg px-4">Download Mac ARM</a>
+      <a href="#" class="btn btn-primary btn-lg px-4">Download Linux</a>
+    </div>
+
+    <div class="mb-3">
+      <p class="fs-5 mb-3">Or install via <code>Cargo:</code></p>
+      <pre class="bg-light rounded">
+        <code class="language-bash">
+        $ git clone https://github.com/edvm/GPTi.git
+        $ cd GPTi &&  build --release
+        </code>
+      </pre>
+
+      <p class="fs-5 mb-4">Or install via <code>curl</code></p>
+      <pre class="bg-light rounded">
+        <code class="language-bash">
+          $ bash -c "$(curl -fsSL https://github.com/edvm/GPTi/raw/main/docs/releases/install.sh)"
+        </code>
+      </pre>
     </div>
 
     <hr class="col-3 col-md-2 mb-5">
 
     <div class="row g-5">
       <div class="col-md-6">
-        <h2 class="text-body-emphasis">Starter projects</h2>
-        <p>Ready to go beyond the starter template? Check out these open source projects that you can quickly duplicate to a new GitHub repository.</p>
-        <ul class="list-unstyled ps-0">
-          <li>
-            <a class="icon-link mb-1" href="https://github.com/twbs/examples/tree/main/icons-font" rel="noopener" target="_blank">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap npm starter
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="https://github.com/twbs/examples/tree/main/parcel" rel="noopener" target="_blank">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Parcel starter
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="https://github.com/twbs/examples/tree/main/vite" rel="noopener" target="_blank">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Vite starter
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="https://github.com/twbs/examples/tree/main/webpack" rel="noopener" target="_blank">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Webpack starter
-            </a>
-          </li>
+        <h2 class="text-body-emphasis">Quick Start</h2>
+      </div>
+      <div class="col-md-6">
+        <h2 class="text-body-emphasis">Configuration</h2>
+        <p><ul>
+          <li>Place the <code>gpti</code>binary in a path where your shell can find it (adjust $HOME, etc.). Give it exec permissions.</li>
+          <li>Run <code>gpti -p init</code> to create a default config. It'll to confirm a template config fire and will tell you where the file is going to be created.</li>
         </ul>
+        <pre class="bg-light rounded">
+          <code class="language-bash">
+            $ gpti -p init
+
+              Config file not found at: /home/edvm/.config/gpti/gpti.toml
+              It may be the first time you're running this program.
+              I can help you with that by creating a default config file for you.
+              Or you can give a path to an existing config file with the --config flag.
+              Do you want me to create a default config file?
+      
+              Type y or yes to confirm, anything else to cancel.
+          </code>
+        </pre>
+
+        <ul>
+          <li>Be sure to edit <code>gpti.toml</code>, you need to set your OpenAI api key. Also, use the <code>[[prompt]]</code> block to define any number of prompts you want.</li>
+        </ul>
+        <pre class="bg-light rounded">
+          <code class="language-bash">
+            $ gpti -p init
+
+              Config file not found at: /home/edvm/.config/gpti/gpti.toml
+              It may be the first time you're running this program.
+              I can help you with that by creating a default config file for you.
+              Or you can give a path to an existing config file with the --config flag.
+              Do you want me to create a default config file?
+      
+              Type y or yes to confirm, anything else to cancel.
+          </code>
+        </pre>
+
+      </p>
+      
       </div>
 
-      <div class="col-md-6">
-        <h2 class="text-body-emphasis">Guides</h2>
-        <p>Read more detailed instructions and documentation on using or contributing to Bootstrap.</p>
-        <ul class="list-unstyled ps-0">
-          <li>
-            <a class="icon-link mb-1" href="../getting-started/introduction/">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap quick start guide
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="../getting-started/webpack/">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Webpack guide
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="../getting-started/parcel/">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Parcel guide
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="../getting-started/vite/">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Bootstrap Vite guide
-            </a>
-          </li>
-          <li>
-            <a class="icon-link mb-1" href="../getting-started/contribute/">
-              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-circle"/></svg>
-              Contributing to Bootstrap
-            </a>
-          </li>
-        </ul>
-      </div>
     </div>
   </main>
   <footer class="pt-5 my-5 text-body-secondary border-top">
